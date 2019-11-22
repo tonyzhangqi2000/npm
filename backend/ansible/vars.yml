@@ -1,0 +1,19 @@
+---
+images:
+  elasticsearch: {"image":"docker.elastic.co/elasticsearch/elasticsearch-oss", "version":"6.3.2"}
+  grafana: {"image":"e4/grafana", "version":"5.2.3"}
+  prometheus: {"image":"prom/prometheus", "version":"v2.3.2"}
+  cadvisor: {"image": "google/cadvisor", "version": "v0.30.2"}
+  node_exporter: {"image": "prom/node-exporter", "version": "v0.16.0"}
+  influxdb: {"image": "influxdb", "version": "1.6.3"}
+  redis: {"image": "redis", "version": "4"}
+  nsot: {"image": "nizq/nsot", "version": "1.4.3"}
+services:
+  - cadvisor
+  - node-exporter
+  - dashboard
+  - elasticsearch
+  - influxdb
+  - prometheus
+  - redis
+  - weave

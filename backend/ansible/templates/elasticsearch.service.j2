@@ -1,0 +1,32 @@
+[Unit]
+After=weave.service
+Description=dashboard
+Documentation=https://e4hitech.com/
+
+[Service]
+TimeoutStartSec=0
+
+Environment=NAME=elasticsearch
+ExecStartPre=-/usr/bin/docker rm -f $NAME
+ExecStartPre=/bin/bash -c 'eval /usr/local/bin/weave env);\
+                           /usr/bin/docker run -d --name $NAME \
+                                           -e http.host=0.0.0.0 \
+                                           -e transport.host=0.0.0.0 \
+                                           -e discovery.type=single-node \
+                                           -e cluster.name=ntop \
+                                           -e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+                                           -e thread_pool.index.queue_size=100000 \
+                                           -e thread_pool.search.queue_size=100000 \
+                                           -e thread_pool.bulk.queue_size=100000 \
+                                           -v elasticsearch-data:/usr/share/elasticsearch/data \
+                                           -p 9200:9200 \
+                                           -v /etc/localtime:/etc/localtime \
+                                           {{ images["elasticsearch"]["image"] }}:{{ images["elasticsearch"]["version"] }}'
+
+ExecStart=/usr/bin/docker attach $NAME
+Restart=on-failure
+
+ExecStop=/usr/bin/docker stop $NAME
+
+[Install]
+WantedBy=multi-user.target

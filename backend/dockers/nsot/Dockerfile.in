@@ -1,0 +1,20 @@
+FROM debian:jessie
+
+RUN sed -i "s/deb.debian/ftp.cn.debian/g" /etc/apt/sources.list \
+    && apt update \
+    && apt upgrade -y \
+    && apt install -y libpq5 libpq-dev libffi-dev libssl-dev libyaml-dev openssl python python-dev python-pip \
+    && mkdir /root/.pip \
+    && echo "[global]" > /root/.pip/pip.conf \
+    && echo "index-url = https://pypi.doubanio.com/simple" >> /root/.pip/pip.conf \
+    && pip install -U setuptools pip \
+    && pip install nsot psycopg2 \
+    && apt remove -y libpq-dev libffi-dev libssl-dev libyaml-dev python-dev python-pip \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists /usr/share/doc
+
+COPY nsot.conf.py /etc/nsot.conf.py
+
+ENTRYPOINT ["nsot-server", "--config=/etc/nsot.conf.py"]
+
+CMD ["start", "--noinput"]

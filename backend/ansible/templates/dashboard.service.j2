@@ -1,0 +1,27 @@
+[Unit]
+After=weave.service
+Description=dashboard
+Documentation=https://e4hitech.com/
+
+[Service]
+TimeoutStartSec=0
+
+Environment=NAME=dashboard
+ExecStartPre=-/usr/bin/docker rm -f $NAME
+ExecStartPre=/bin/bash -c 'eval /usr/local/bin/weave env;\
+                           /usr/bin/docker run -d --name $NAME \
+                                           -e "GF_AUTH_PROXY_ENABLED=true" \
+                                           -e "GF_AUTH_PROXY_HEADER_NAME=X-WEBAUTH-USER" \
+                                           -e "GF_AUTH_BASIC_ENABLED=false" \
+                                           -e "GF_AUTH_PROXY_HEADER_PROPERTY=username" \
+                                           -e "GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/dash" \
+                                           -v dashboard-data:/var/lib/grafana \
+                                           -v /etc/localtime:/etc/localtime \
+                                           {{ images["grafana"]["image"] }}:{{ images["grafana"]["version"] }}'
+ExecStart=/usr/bin/docker attach $NAME
+Restart=on-failure
+
+ExecStop=/usr/bin/docker stop $NAME
+
+[Install]
+WantedBy=multi-user.target

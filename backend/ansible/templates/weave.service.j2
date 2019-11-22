@@ -1,0 +1,18 @@
+[Unit]
+After=docker.service
+Description=weave
+Documentation=https://e4hitech.com/
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+
+ExecStartPre=/usr/local/bin/weave launch --no-restart
+ExecStart=/usr/bin/docker attach weave
+ExecStartPost=/usr/local/bin/weave expose
+Restart=on-failure
+
+ExecStop=/usr/local/bin/weave stop
+
+[Install]
+WantedBy=multi-user.target

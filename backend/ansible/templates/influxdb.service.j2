@@ -1,0 +1,23 @@
+[Unit]
+After=weave.service
+Description=influxdb
+Documentation=https://e4hitech.com/
+
+[Service]
+TimeoutStartSec=0
+
+Environment=NAME=influxdb
+ExecStartPre=-/usr/bin/docker rm -f $NAME
+ExecStartPre=/bin/bash -c 'eval /usr/local/bin/weave env);\
+                                /usr/bin/docker run -d --name $NAME \
+                                                -v /etc/localtime:/etc/localtime \
+                                                -v influxdb-data:/var/lib/influxdb \
+                                                {{ images["influxdb"]["image"] }}:{{ images["influxdb"]["version"] }}'
+
+ExecStart=/usr/bin/docker attach $NAME
+Restart=on-failure
+
+ExecStop=/usr/bin/docker stop $NAME
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,33 @@
+---
+- name: deploy
+  hosts: localhost
+  vars_files:
+    - vars.yml
+  tasks:
+    ## data volumes
+    - name: Create a volumes
+      docker_volume:
+        name: "{{ item }}"
+      with_items:
+        - prometheus-data
+        - dashboard-data
+        - elasticsearch-data
+        - influxdb-data
+        - redis-data
+        - nsot-data
+
+    - name: create dirs
+      file: path={{ item }} state=directory mode=0755
+      with_items:
+        - "/etc/prometheus"
+      become: true
+
+    - name: create services
+      template: src={{ item }}.service.j2 dest=/etc/systemd/system/{{ item }}.service
+      with_items: "{{ services }}"
+      become: true
+
+    - name: enable services
+      service: name={{ item }} enabled=yes state=started
+      with_items: "{{ services }}"
+      become: true

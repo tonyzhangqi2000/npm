@@ -1,0 +1,27 @@
+[Unit]
+After=docker.service
+Description=node-exporter
+Documentation=https://e4hitech.com/
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+
+Environment=NAME=node-exporter
+Environment=HOST=$(/usr/local/bin/weave expose)
+ExecStartPre=-/usr/bin/docker rm -f $NAME
+ExecStartPre=/bin/bash -c 'eval /usr/local/bin/weave env);\
+                                /usr/bin/docker run -d --name $NAME \
+                                                --net=host \
+                                                --pid="host" \
+                                                -v /etc/localtime:/etc/localtime \
+                                                {{ images["node_exporter"]["image"] }}:{{ images["node_exporter"]["version"] }} \
+                                                   --web.listen-address="$HOST:9100"'
+
+ExecStart=/usr/bin/docker attach $NAME
+Restart=on-failure
+
+ExecStop=/usr/bin/docker stop $NAME
+
+[Install]
+WantedBy=multi-user.target

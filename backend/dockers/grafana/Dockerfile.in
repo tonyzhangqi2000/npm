@@ -1,0 +1,14 @@
+FROM grafana/grafana:@VERSION@
+
+RUN echo "installing plugins..."\
+    && grafana-cli plugins install grafana-worldmap-panel \
+    && grafana-cli plugins install grafana-piechart-panel \
+    && grafana-cli plugins install digiapulssi-breadcrumb-panel \
+    && grafana-cli plugins install digrich-bubblechart-panel \
+    && grafana-cli plugins install petrslavotinek-carpetplot-panel \
+    && grafana-cli plugins install natel-plotly-panel \
+    && grafana-cli plugins install skydive-datasource
+
+RUN mkdir -p /var/lib/grafana/data \
+    && chown grafana:grafana /var/lib/grafana/data
+    

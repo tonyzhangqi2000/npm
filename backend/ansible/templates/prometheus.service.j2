@@ -1,0 +1,24 @@
+[Unit]
+After=weave.service
+Description=prometheus
+Documentation=https://e4hitech.com/
+
+[Service]
+TimeoutStartSec=0
+
+Environment=NAME=prometheus
+ExecStartPre=-/usr/bin/docker rm -f $NAME
+ExecStartPre=/bin/bash -c 'eval /usr/local/bin/weave env;\
+                           /usr/bin/docker run -d --name $NAME \
+                                           -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+                                           -v prometheus-data:/prometheus \
+                                           -v /etc/localtime:/etc/localtime \
+                                           {{ images["prometheus"]["image"] }}:{{ images["prometheus"]["version"] }}'
+
+ExecStart=/usr/bin/docker attach $NAME
+Restart=on-failure
+
+ExecStop=/usr/bin/docker stop $NAME
+
+[Install]
+WantedBy=multi-user.target

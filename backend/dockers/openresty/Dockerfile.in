@@ -1,0 +1,7 @@
+FROM openresty/openresty:@TAG@
+
+RUN PATH=$PATH:/usr/local/openresty/bin \
+    && opm install SkyLothar/lua-resty-jwt \
+    && opm install pintsized/lua-resty-http \
+    && opm get bungle/lua-resty-session \
+    && opm get bungle/lua-resty-template
